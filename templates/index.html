@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Payment Tracking</title>
+    <style>
+        /* Add your CSS styles here */
+        #taxTableContainer {
+            max-height: 400px; /* Set maximum height */
+            overflow-y: auto; /* Add vertical scrollbar if content exceeds height */
+        }
+    </style>
+</head>
+<body>
+    <h1>Tax Payment Tracking System</h1>
+    <form id="taxForm" action="/taxes" method="POST">
+        <label for="company">Company:</label>
+        <input type="text" id="company" name="company" required><br><br>
+        
+        <label for="amount">Amount:</label>
+        <input type="number" id="amount" name="amount" required><br><br>
+        
+        <label for="paymentDate">Payment Date:</label>
+        <input type="date" id="paymentDate" name="paymentDate" required><br><br>
+        
+        <label for="status">Status:</label>
+        <input type="text" id="status" name="status" required><br><br>
+        
+        <label for="dueDate">Due Date:</label>
+        <select id="dueDate" name="dueDate" required>
+        </select><br><br>
+
+        <label for="taxRate">Tax Rate (decimal):</label>
+        <input type="text" id="taxRateField" name="taxRate" required><br><br>
+        
+        <input type="submit" value="Save">
+    </form>
+
+    <div id="taxTableContainer">
+        <table id="taxTable">
+            <thead>
+                <tr>
+                    <th>Company</th>
+                    <th>Amount</th>
+                    <th>Payment Date</th>
+                    <th>Status</th>
+                    <th>Due Date</th>
+                    <th>Operations</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Table body will be populated dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Summary</h2>
+    <label for="summaryDueDate">Select Due Date:</label>
+    <select id="summaryDueDate" name="summaryDueDate" onchange="updateSummaryTable()">
+        <option value="January 15">January 15</option>
+        <option value="April 15">April 15</option>
+        <option value="June 15">June 15</option>
+        <option value="September 15">September 15</option>
+    </select><br><br>
+
+    <div id="summaryTableContainer">
+        <table id="summaryTable">
+            <thead>
+                <tr>
+                    <th>Company</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Due Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Summary table body will be populated dynamically -->
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4">Total Amount</td>
+                    <td id="totalAmount">0.00</td>
+                </tr>
+                <tr>
+                    <td colspan="4">Tax Rate:</td>
+                    <td id="taxRate">0.00%</td>
+                </tr>
+                <tr>
+                    <td colspan="4">Tax Due:</td>
+                    <td id="taxDue">0.00</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+<!-- Add a modal for editing -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeEditModal()">&times;</span>
+        <h2>Edit Tax Record</h2>
+        <form id="editForm">
+            <input type="hidden" id="editId" name="id">
+            <label for="editCompany">Company:</label>
+            <input type="text" id="editCompany" name="company" required><br><br>
+            <label for="editAmount">Amount:</label>
+            <input type="number" id="editAmount" name="amount" required><br><br>
+            <label for="editPaymentDate">Payment Date:</label>
+            <input type="date" id="editPaymentDate" name="paymentDate" required><br><br>
+            <label for="editStatus">Status:</label>
+            <input type="text" id="editStatus" name="status" required><br><br>
+            <label for="editDueDate">Due Date:</label>
+            <select id="editDueDate" name="dueDate" required>
+                <option value="January 15">January 15</option>
+                <option value="April 15">April 15</option>
+                <option value="June 15">June 15</option>
+                <option value="September 15">September 15</option>
+            </select><br><br>
+            <input type="submit" value="Save">
+        </form>
+    </div>
+</div>
+
+    <script>
+
+// Function to open the delete modal
+function openDeleteModal() {
+    document.getElementById('deleteModal').style.display = 'block';
+}
+
+// Function to close the delete modal
+function closeDeleteModal() {
+    document.getElementById('deleteModal').style.display = 'none';
+}
+
+
+function deleteRecord(id) {
+    if (confirm("Are you sure you want to delete this record?")) {
+        fetch('/delete_tax_record?id=' + id, {
+            method: 'DELETE'
+        })
+        .then(response => response.text())
+        .then(data => {
+            console.log(data); // Log the response from the server
+            // Refresh the tax table to reflect the changes
+            fetchTaxRecords();
+        })
+        .catch(error => console.error('Error deleting tax record:', error));
+    }
+}
+
+        //Function to fetch tax records from the server and populate the tax table
+        function fetchTaxRecords() {
+            fetch('/get_tax_records')
+                .then(response => response.json())
+                .then(data => {
+                    const taxTableBody = document.getElementById('taxTable').getElementsByTagName('tbody')[0];
+                    taxTableBody.innerHTML = ''; // Clear previous rows
+                    data.forEach(record => {
+                        taxTableBody.innerHTML += '<tr><td>' + record.company + '</td><td>' + record.amount.toFixed(2) + '</td><td>' + record.payment_date + '</td><td>' + record.status + '</td><td>' + record.due_date + '</td><td><a href="#" onclick="openEditModal(' + record.id + ')">Edit</a> | <a href="#" onclick="deleteRecord(' + record.id + ')">Delete</a></td></tr>';
+                    });
+                })
+                .catch(error => console.error('Error fetching tax records:', error));
+        }
+
+        function openEditModal(id) {
+        // Fetch the tax record with the given ID
+        fetch('/get_tax_record?id=' + id)
+            .then(response => response.json())
+            .then(data => {
+                const record = data[0]; // Assuming only one record is returned
+                // Populate the edit form fields with the record details
+                document.getElementById('editId').value = record.id;
+                document.getElementById('editCompany').value = record.company;
+                document.getElementById('editAmount').value = record.amount;
+                document.getElementById('editPaymentDate').value = record.payment_date;
+                document.getElementById('editStatus').value = record.status;
+                document.getElementById('editDueDate').value = record.due_date;
+                // Display the edit modal
+                document.getElementById('editModal').style.display = 'block';
+            })
+            .catch(error => console.error('Error fetching tax record:', error));
+    }
+
+    // Function to close the edit modal
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+    // Function to handle the submission of the edited record
+    document.getElementById('editForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const formData = new FormData(this);
+        fetch('/update_tax_record', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.text())
+        .then(data => {
+            console.log(data); // Log the response from the server
+            // Close the edit modal
+            closeEditModal();
+            // Refresh the tax table to reflect the changes
+            fetchTaxRecords();
+        })
+        .catch(error => console.error('Error updating tax record:', error));
+    });
+    
+
+    
+    // Function to generate due date options dynamically based on the current year
+    function generateDueDateOptions() {
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+
+        const dueDates = [
+            { month: 0, day: 15, label: 'January 15' },
+            { month: 3, day: 15, label: 'April 15' },
+            { month: 5, day: 15, label: 'June 15' },
+            { month: 8, day: 15, label: 'September 15' }
+        ];
+
+        const dueDateSelect = document.getElementById('dueDate');
+        if (!dueDateSelect) {
+            console.error('Element with ID "dueDate" not found.');
+            return;
+        }
+        console.log('Dropdown element found:', dueDateSelect); // Log the dropdown element
+        dueDateSelect.innerHTML = '';
+
+        dueDates.forEach(dueDate => {
+            // Calculate due year based on the current year and month
+            let dueYear = currentYear + 1;
+            const optionDate = new Date(dueYear, dueDate.month, dueDate.day);
+            const optionLabel = dueDate.label + ' ' + dueYear;
+            const optionValue = optionDate.toISOString().slice(0, 10);
+            console.log('Adding option:', optionLabel); // Log each option being added
+            const option = new Option(optionLabel, optionValue);
+            dueDateSelect.add(option);
+        });
+    }
+
+    // Call the function to generate due date options when the page loads
+    window.onload = function() {
+        generateDueDateOptions();
+        fetchTaxRecords();
+        console.log('Due date options generated.');
+    };
+
+
+</script>
+
+</body>
+</html>
