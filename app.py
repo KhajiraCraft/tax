@@ -78,6 +78,8 @@ def get_tax_records():
 
     return jsonify(tax_records)
 
+
+
 # #Start of Code Test
 # @app.route('/get_tax_records')
 # def get_tax_records():

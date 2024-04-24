@@ -60,10 +60,10 @@
     <input type="text" id="taxRateField" name="taxRate" required><br><br>
     <label for="summaryDueDate">Select Due Date:</label>
     <select id="summaryDueDate" name="summaryDueDate" onchange="updateSummaryTable()">
-        <option value="January 15">January 15</option>
+        <!-- <option value="January 15">January 15</option>
         <option value="April 15">April 15</option>
         <option value="June 15">June 15</option>
-        <option value="September 15">September 15</option>
+        <option value="September 15">September 15</option> -->
     </select><br><br>
 
   
@@ -313,11 +313,56 @@ function generateEditDueDateOptions(selectedDueDate) {
     }
 
 
+// Function to generate summary due date options dynamically based on the current year
+function generateSummaryDueDateOptions(selectedDueDate) {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+
+    const dueDates = [
+        { month: 0, day: 15, label: 'January 15' },
+        { month: 3, day: 15, label: 'April 15' },
+        { month: 5, day: 15, label: 'June 15' },
+        { month: 8, day: 15, label: 'September 15' }
+    ];
+
+    const summaryDueDateSelect = document.getElementById('summaryDueDate');
+    if (!summaryDueDateSelect) {
+        console.error('Element with ID "summaryDueDate" not found.');
+        return;
+    }
+    console.log('Dropdown element found:', summaryDueDateSelect); // Log the dropdown element
+    summaryDueDateSelect.innerHTML = '';
+
+    dueDates.forEach(dueDate => {
+        // Calculate due year based on the current year and month
+        let dueYear = currentYear + 1;
+        const optionDate = new Date(dueYear, dueDate.month, dueDate.day);
+        const optionLabel = dueDate.label + ' ' + dueYear;
+        const optionValue = optionDate.toISOString().slice(0, 10);
+        console.log('Adding option:', optionLabel); // Log each option being added
+        const option = new Option(optionLabel, optionValue);
+        if (optionValue === selectedDueDate) {
+            option.selected = true; // Set the option as selected if it matches the selected due date
+        }
+        summaryDueDateSelect.add(option);
+    });
+}
+
+// Call the function to generate summary due date options when the page loads
+// window.onload = function() {
+//     const selectedDueDate = document.getElementById('summaryDueDate').value; // Get the currently selected due date
+//     generateSummaryDueDateOptions(selectedDueDate); // Ensure summary due date options are generated initially with the selected due date
+//     fetchTaxRecords(); // Ensure tax records are fetched initially
+// };
+
+
+
 //NEW CODE START
 document.getElementById('summaryDueDate').addEventListener('change', updateSummaryTable);
 
 function updateSummaryTable() {
     const dueDate = document.getElementById('summaryDueDate').value;
+    console.log(dueDate)
     fetch('/get_tax_records?due_date=' + dueDate)
         .then(response => response.json())
         .then(data => {
@@ -353,6 +398,8 @@ function populateSummaryTable(records) {
     window.onload = function() {
         generateDueDateOptions();
         fetchTaxRecords();
+        const selectedDueDate = document.getElementById('summaryDueDate').value; // Get the currently selected due date
+        generateSummaryDueDateOptions(selectedDueDate);
         console.log('Due date options generated.');
     };
 
