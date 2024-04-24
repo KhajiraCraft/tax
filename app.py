@@ -37,28 +37,59 @@ def insert_tax_record(company, amount, payment_date, status, due_date, tax_due):
 def index():
     return render_template('index.html')
 
-@app.route('/taxes', methods=['POST'])
-def handle_tax_form():
-    company = request.form['company']
-    amount = float(request.form['amount'])
-    payment_date = request.form['paymentDate']
-    status = request.form['status']
-    due_date = request.form['dueDate']
+# @app.route('/taxes', methods=['POST'])
+# def handle_tax_form():
+#     company = request.form['company']
+#     amount = float(request.form['amount'])
+#     payment_date = request.form['paymentDate']
+#     status = request.form['status']
+#     due_date = request.form['dueDate']
     
-    # Calculate tax due based on tax rate (assuming tax rate is provided in the form)
-    tax_rate = float(request.form['taxRate'])
-    tax_due = amount * tax_rate
+#     # Calculate tax due based on tax rate (assuming tax rate is provided in the form)
+#     tax_rate = float(request.form['taxRate'])
+#     tax_due = amount * tax_rate
     
-    # Insert the record into the database
-    insert_tax_record(company, amount, payment_date, status, due_date, tax_due)
+#     # Insert the record into the database
+#     insert_tax_record(company, amount, payment_date, status, due_date, tax_due)
     
-    return 'Record added successfully.'
+#     return 'Record added successfully.'
 
+# @app.route('/get_tax_records')
+# def get_tax_records():
+#     conn = sqlite3.connect(DB_FILE)
+#     c = conn.cursor()
+#     c.execute('''SELECT * FROM tax_records''')
+#     records = c.fetchall()
+#     conn.close()
+
+#     # Convert records to list of dictionaries
+#     tax_records = []
+#     for record in records:
+#         tax_records.append({
+#             'id': record[0],
+#             'company': record[1],
+#             'amount': record[2],
+#             'payment_date': record[3],
+#             'status': record[4],
+#             'due_date': record[5],
+#             'tax_due': record[6]
+#         })
+#     print("Function Triggered")
+
+#     return jsonify(tax_records)
+
+#Start of Code Test
 @app.route('/get_tax_records')
 def get_tax_records():
+    due_date = request.args.get('due_date')
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
-    c.execute('''SELECT * FROM tax_records''')
+
+    if due_date:
+        c.execute('''SELECT * FROM tax_records WHERE due_date=?''', (due_date,))
+    else:
+        c.execute('''SELECT * FROM tax_records''')
+
     records = c.fetchall()
     conn.close()
 
@@ -69,17 +100,35 @@ def get_tax_records():
             'id': record[0],
             'company': record[1],
             'amount': record[2],
-            'payment_date': record[3],
-            'status': record[4],
-            'due_date': record[5],
-            'tax_due': record[6]
+            'status': record[3],
+            'due_date': record[4]
         })
-    print("Function Triggered")
 
     return jsonify(tax_records)
 
 
+#End Code Test
 
+#Start Code Test
+@app.route('/taxes', methods=['POST'])
+def handle_tax_form():
+    company = request.form['company']
+    amount = float(request.form['amount'])
+    payment_date = request.form['paymentDate']
+    status = request.form['status']
+    due_date = request.form['dueDate']
+    tax_rate = float(request.form['taxRate'])
+
+    # Calculate tax due based on tax rate
+    tax_due = amount * tax_rate
+
+    # Insert the record into the database
+    insert_tax_record(company, amount, payment_date, status, due_date, tax_due)
+
+    return 'Record added successfully.'
+
+
+#End of code test
 
 @app.route('/delete_tax_record', methods=['DELETE'])
 def delete_tax_record():
@@ -132,6 +181,9 @@ def update_tax_record():
     conn.close()
 
     return 'Record updated successfully.'
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

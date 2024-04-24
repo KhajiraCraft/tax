@@ -56,6 +56,8 @@
     </div>
 
     <h2>Summary</h2>
+    <label for="taxRate">Enter Tax Rate (decimal):</label>
+    <input type="text" id="taxRateField" name="taxRate" required><br><br>
     <label for="summaryDueDate">Select Due Date:</label>
     <select id="summaryDueDate" name="summaryDueDate" onchange="updateSummaryTable()">
         <option value="January 15">January 15</option>
@@ -63,6 +65,10 @@
         <option value="June 15">June 15</option>
         <option value="September 15">September 15</option>
     </select><br><br>
+
+  
+   
+    
 
     <div id="summaryTableContainer">
         <table id="summaryTable">
@@ -109,17 +115,22 @@
             <input type="date" id="editPaymentDate" name="paymentDate" required><br><br>
             <label for="editStatus">Status:</label>
             <input type="text" id="editStatus" name="status" required><br><br>
-            <label for="editDueDate">Due Date:</label>
+            <!-- <label for="editDueDate">Due Date:</label>
             <select id="editDueDate" name="dueDate" required>
                 <option value="January 15">January 15</option>
                 <option value="April 15">April 15</option>
                 <option value="June 15">June 15</option>
-                <option value="September 15">September 15</option>
+                <option value="September 15">September 15</option> -->
+                <label for="editDueDate">Due Date:</label>
+<select id="editDueDateSelect" name="dueDate" required>
             </select><br><br>
             <input type="submit" value="Save">
         </form>
     </div>
 </div>
+
+
+
 
     <script>
 
@@ -162,25 +173,86 @@ function deleteRecord(id) {
                 })
                 .catch(error => console.error('Error fetching tax records:', error));
         }
+//OPENEDITMODAL!!
+    //     function openEditModal(id) {
+    //     // Fetch the tax record with the given ID
+    //     fetch('/get_tax_record?id=' + id)
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             const record = data[0]; // Assuming only one record is returned
+    //             // Populate the edit form fields with the record details
+    //             document.getElementById('editId').value = record.id;
+    //             document.getElementById('editCompany').value = record.company;
+    //             document.getElementById('editAmount').value = record.amount;
+    //             document.getElementById('editPaymentDate').value = record.payment_date;
+    //             document.getElementById('editStatus').value = record.status;
+    //             document.getElementById('editDueDate').value = record.due_date;
+    //             // Display the edit modal
+    //             document.getElementById('editModal').style.display = 'block';
+    //         })
+    //         .catch(error => console.error('Error fetching tax record:', error));
+    // }
 
-        function openEditModal(id) {
-        // Fetch the tax record with the given ID
-        fetch('/get_tax_record?id=' + id)
-            .then(response => response.json())
-            .then(data => {
-                const record = data[0]; // Assuming only one record is returned
-                // Populate the edit form fields with the record details
-                document.getElementById('editId').value = record.id;
-                document.getElementById('editCompany').value = record.company;
-                document.getElementById('editAmount').value = record.amount;
-                document.getElementById('editPaymentDate').value = record.payment_date;
-                document.getElementById('editStatus').value = record.status;
-                document.getElementById('editDueDate').value = record.due_date;
-                // Display the edit modal
-                document.getElementById('editModal').style.display = 'block';
-            })
-            .catch(error => console.error('Error fetching tax record:', error));
+//NEW CODE FOR TEST START
+function openEditModal(id) {
+    // Fetch the tax record with the given ID
+    fetch('/get_tax_record?id=' + id)
+        .then(response => response.json())
+        .then(data => {
+            const record = data[0]; // Assuming only one record is returned
+            // Populate the edit form fields with the record details
+            document.getElementById('editId').value = record.id;
+            document.getElementById('editCompany').value = record.company;
+            document.getElementById('editAmount').value = record.amount;
+            document.getElementById('editPaymentDate').value = record.payment_date;
+            document.getElementById('editStatus').value = record.status;
+
+            // Dynamically generate due date options
+            generateEditDueDateOptions(record.due_date);
+
+            // Display the edit modal
+            document.getElementById('editModal').style.display = 'block';
+        })
+        .catch(error => console.error('Error fetching tax record:', error));
+}
+
+// Function to generate due date options dynamically based on the current year
+function generateEditDueDateOptions(selectedDueDate) {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+
+    const dueDates = [
+        { month: 0, day: 15, label: 'January 15' },
+        { month: 3, day: 15, label: 'April 15' },
+        { month: 5, day: 15, label: 'June 15' },
+        { month: 8, day: 15, label: 'September 15' }
+    ];
+
+    const editDueDateSelect = document.getElementById('editDueDateSelect');
+    if (!editDueDateSelect) {
+        console.error('Element with ID "editDueDateSelect" not found.');
+        return;
     }
+    console.log('Dropdown element found:', editDueDateSelect); // Log the dropdown element
+    editDueDateSelect.innerHTML = '';
+
+    dueDates.forEach(dueDate => {
+        // Calculate due year based on the current year and month
+        let dueYear = currentYear + 1;
+        const optionDate = new Date(dueYear, dueDate.month, dueDate.day);
+        const optionLabel = dueDate.label + ' ' + dueYear;
+        const optionValue = optionDate.toISOString().slice(0, 10);
+        console.log('Adding option:', optionLabel); // Log each option being added
+        const option = new Option(optionLabel, optionValue);
+        if (optionValue === selectedDueDate) {
+            option.selected = true;
+        }
+        editDueDateSelect.add(option);
+    });
+}
+//NEW CODE END LINE
+
+
 
     // Function to close the edit modal
     function closeEditModal() {
@@ -239,6 +311,43 @@ function deleteRecord(id) {
             dueDateSelect.add(option);
         });
     }
+
+
+//NEW CODE START
+document.getElementById('summaryDueDate').addEventListener('change', updateSummaryTable);
+
+function updateSummaryTable() {
+    const dueDate = document.getElementById('summaryDueDate').value;
+    fetch('/get_tax_records?due_date=' + dueDate)
+        .then(response => response.json())
+        .then(data => {
+            populateSummaryTable(data);
+        })
+        .catch(error => console.error('Error fetching tax records:', error));
+}
+
+function populateSummaryTable(records) {
+    const summaryTableBody = document.getElementById('summaryTable').getElementsByTagName('tbody')[0];
+    summaryTableBody.innerHTML = ''; // Clear previous rows
+
+    let totalAmount = 0;
+    records.forEach(record => {
+        summaryTableBody.innerHTML += '<tr><td>' + record.company + '</td><td>' + record.amount.toFixed(2) + '</td><td>' + record.status + '</td><td>' + record.due_date + '</td></tr>';
+        totalAmount += record.amount;
+    });
+
+    // Update total amount in the summary table
+    document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
+
+    // Update tax due based on tax rate
+    const taxRate = parseFloat(document.getElementById('taxRateField').value);
+    const taxDue = totalAmount * taxRate;
+    document.getElementById('taxDue').textContent = taxDue.toFixed(2);
+}
+
+//NEW CODE END
+
+
 
     // Call the function to generate due date options when the page loads
     window.onload = function() {
