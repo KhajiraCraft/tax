@@ -60,6 +60,7 @@
     <input type="text" id="taxRateField" name="taxRate" required><br><br>
     <label for="summaryDueDate">Select Due Date:</label>
     <select id="summaryDueDate" name="summaryDueDate" onchange="updateSummaryTable()">
+        <option value="">None</option>
         <!-- <option value="January 15">January 15</option>
         <option value="April 15">April 15</option>
         <option value="June 15">June 15</option>
@@ -123,6 +124,7 @@
                 <option value="September 15">September 15</option> -->
                 <label for="editDueDate">Due Date:</label>
 <select id="editDueDateSelect" name="dueDate" required>
+   
             </select><br><br>
             <input type="submit" value="Save">
         </form>
@@ -300,6 +302,8 @@ function generateEditDueDateOptions(selectedDueDate) {
         console.log('Dropdown element found:', dueDateSelect); // Log the dropdown element
         dueDateSelect.innerHTML = '';
 
+    //     const noneOption = new Option('None Selected', '');
+    // dueDateSelect.add(noneOption);
         dueDates.forEach(dueDate => {
             // Calculate due year based on the current year and month
             let dueYear = currentYear + 1;
@@ -333,6 +337,9 @@ function generateSummaryDueDateOptions(selectedDueDate) {
     console.log('Dropdown element found:', summaryDueDateSelect); // Log the dropdown element
     summaryDueDateSelect.innerHTML = '';
 
+    const noneOption = new Option('None', '');
+    summaryDueDateSelect.add(noneOption);
+
     dueDates.forEach(dueDate => {
         // Calculate due year based on the current year and month
         let dueYear = currentYear + 1;
@@ -363,7 +370,7 @@ document.getElementById('summaryDueDate').addEventListener('change', updateSumma
 function updateSummaryTable() {
     const dueDate = document.getElementById('summaryDueDate').value;
     console.log(dueDate)
-    fetch('/get_tax_records?due_date=' + dueDate)
+    fetch('/get_tax_summary_records?due_date=' + dueDate)
         .then(response => response.json())
         .then(data => {
             populateSummaryTable(data);
