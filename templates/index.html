@@ -15,8 +15,14 @@
         <label for="paymentDate">Payment Date:</label>
         <input type="date" id="paymentDate" name="paymentDate" required><br><br>
         
+        <!-- <label for="status">Status:</label>
+        <input type="text" id="status" name="status" required><br><br> -->
+
         <label for="status">Status:</label>
-        <input type="text" id="status" name="status" required><br><br>
+        <select id="status" name="status" required>
+            <option value="Paid">Paid</option>
+            <option value="Unpaid">Unpaid</option>
+        </select><br><br>
         
         <label for="dueDate">Due Date:</label>
         <select id="dueDate" name="dueDate" required>

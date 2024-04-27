@@ -48,10 +48,11 @@ def handle_tax_form():
     payment_date = request.form['paymentDate']
     status = request.form['status']
     due_date = request.form['dueDate']
-    tax_rate = float(request.form['taxRate'])
+    # tax_rate = float(request.form['taxRate'])
 
     # # Calculate tax due based on tax rate
-    tax_rate = float(request.form['taxRate'])
+    # tax_rate = float(request.form['taxRate'])
+    tax_rate = float(request.form.get('taxRate', 0.0))
     tax_due = amount * tax_rate
     
     # # Insert the record into the database
