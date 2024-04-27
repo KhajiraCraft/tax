@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tax Payment Tracking</title>
+    <title>Tax Payment Tracking System</title>
     <style>
         /* Add your CSS styles here */
         #taxTableContainer {
@@ -31,8 +31,8 @@
         <select id="dueDate" name="dueDate" required>
         </select><br><br>
 
-        <label for="taxRate">Tax Rate (decimal):</label>
-        <input type="text" id="taxRateField" name="taxRate" required><br><br>
+        <!-- <label for="taxRate">Tax Rate (decimal):</label>
+        <input type="text" id="taxRateField" name="taxRate" required><br><br> -->
         
         <input type="submit" value="Save">
     </form>
@@ -60,11 +60,6 @@
     <input type="text" id="taxRateField" name="taxRate" required><br><br>
     <label for="summaryDueDate">Select Due Date:</label>
     <select id="summaryDueDate" name="summaryDueDate" onchange="updateSummaryTable()">
-        <option value="">None</option>
-        <!-- <option value="January 15">January 15</option>
-        <option value="April 15">April 15</option>
-        <option value="June 15">June 15</option>
-        <option value="September 15">September 15</option> -->
     </select><br><br>
 
   
@@ -367,9 +362,42 @@ function generateSummaryDueDateOptions(selectedDueDate) {
 //NEW CODE START
 document.getElementById('summaryDueDate').addEventListener('change', updateSummaryTable);
 
+// function updateSummaryTable() {
+//     const dueDate = document.getElementById('summaryDueDate').value;
+//     console.log(dueDate)
+//     fetch('/get_tax_summary_records?due_date=' + dueDate)
+//         .then(response => response.json())
+//         .then(data => {
+//             populateSummaryTable(data);
+//         })
+//         .catch(error => console.error('Error fetching tax records:', error));
+// }
+
+// function populateSummaryTable(records) {
+//     const summaryTableBody = document.getElementById('summaryTable').getElementsByTagName('tbody')[0];
+//     summaryTableBody.innerHTML = ''; // Clear previous rows
+
+//     let totalAmount = 0;
+//     records.forEach(record => {
+//         summaryTableBody.innerHTML += '<tr><td>' + record.company + '</td><td>' + record.amount.toFixed(2) + '</td><td>' + record.status + '</td><td>' + record.due_date + '</td></tr>';
+//         totalAmount += record.amount;
+//     });
+
+//     // Update total amount in the summary table
+//     document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
+
+//     // Update tax due based on tax rate
+//     const taxRate = parseFloat(document.getElementById('taxRateField').value);
+//     const taxDue = totalAmount * taxRate;
+//     document.getElementById('taxDue').textContent = taxDue.toFixed(2);
+// }
+
+//NEW CODE END
+
+
+// Function to update the summary table based on selected due date and tax rate
 function updateSummaryTable() {
     const dueDate = document.getElementById('summaryDueDate').value;
-    console.log(dueDate)
     fetch('/get_tax_summary_records?due_date=' + dueDate)
         .then(response => response.json())
         .then(data => {
@@ -378,6 +406,7 @@ function updateSummaryTable() {
         .catch(error => console.error('Error fetching tax records:', error));
 }
 
+// Function to populate the summary table with records and calculate tax due based on tax rate
 function populateSummaryTable(records) {
     const summaryTableBody = document.getElementById('summaryTable').getElementsByTagName('tbody')[0];
     summaryTableBody.innerHTML = ''; // Clear previous rows
@@ -391,13 +420,17 @@ function populateSummaryTable(records) {
     // Update total amount in the summary table
     document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
 
-    // Update tax due based on tax rate
+    // Update tax due based on tax rate entered by the user
     const taxRate = parseFloat(document.getElementById('taxRateField').value);
     const taxDue = totalAmount * taxRate;
     document.getElementById('taxDue').textContent = taxDue.toFixed(2);
 }
 
-//NEW CODE END
+// Add event listener to taxRateField to trigger updateSummaryTable() on input change
+document.getElementById('taxRateField').addEventListener('input', updateSummaryTable);
+
+// Call updateSummaryTable() initially to ensure it updates the summary table with default tax rate
+updateSummaryTable();
 
 
 
