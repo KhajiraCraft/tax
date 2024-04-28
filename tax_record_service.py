@@ -2,7 +2,7 @@
 import sqlite3
 from flask import Flask, render_template, request, jsonify,Blueprint
 from models import *
-
+import json
 
 tax_record_service = Blueprint('tax_record_service', __name__)
 
@@ -37,28 +37,44 @@ def get_tax_records():
         })
     print("Function Triggered")
 
-    return jsonify(tax_records)
+    return json.dumps(tax_records)
 
 
 
-@tax_record_service.route('/taxes', methods=['POST'])
-def handle_tax_form():
-    company = request.form['company']
-    amount = float(request.form['amount'])
-    payment_date = request.form['paymentDate']
-    status = request.form['status']
-    due_date = request.form['dueDate']
-    # tax_rate = float(request.form['taxRate'])
+# @tax_record_service.route('/taxes', methods=['POST'])
+# def handle_tax_form():
+#     company = request.form['company']
+#     amount = float(request.form['amount'])
+#     payment_date = request.form['paymentDate']
+#     status = request.form['status']
+#     due_date = request.form['dueDate']
+#     # tax_rate = float(request.form['taxRate'])
 
-    # # Calculate tax due based on tax rate
-    # tax_rate = float(request.form['taxRate'])
-    tax_rate = float(request.form.get('taxRate', 0.0))
-    tax_due = amount * tax_rate
+#     # # Calculate tax due based on tax rate
+#     # tax_rate = float(request.form['taxRate'])
+#     tax_rate = float(request.form.get('taxRate', 0.0))
+#     tax_due = amount * tax_rate
     
-    # # Insert the record into the database
-    insert_tax_record(company, amount, payment_date, status, due_date, tax_due)
+#     # # Insert the record into the database
+#     insert_tax_record(company, amount, payment_date, status, due_date, tax_due)
 
-    return 'Record added successfully.'
+#     return 'Record added successfully.'
+
+
+# def handle_tax_form():
+#     company = request.form['company']
+#     amount = float(request.form['amount'])
+#     payment_date = request.form['paymentDate']
+#     status = request.form['status']
+#     due_date = request.form['dueDate']
+#     tax_rate = float(request.form.get('taxRate', 0.0))
+#     tax_due = amount * tax_rate
+
+#     # Insert the record into the database
+#     insert_tax_record(company, amount, payment_date, status, due_date, tax_due)
+
+#     # Return a JSON response indicating success
+#     return jsonify({'message': 'Record added successfullyyyyy'})
 
 
 @tax_record_service.route('/delete_tax_record', methods=['DELETE'])
