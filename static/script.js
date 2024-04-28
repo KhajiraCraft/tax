@@ -143,29 +143,6 @@ function generateEditDueDateOptions(selectedDueDate) {
         .catch(error => console.error('Error updating tax record:', error));
     });
     
-    document.getElementById('taxForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent default form submission
-        const formData = new FormData(this);
-        
-        // Submit form data asynchronously
-        fetch('/taxes', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json()) // Parse response as JSON
-        .then(data => {
-            // Display success message
-            alert('Record submitted');
-            // Clear form fields
-            document.getElementById('taxForm').reset();
-        })
-        .catch(error => {
-            console.error('Error creating tax record:', error);
-            // Display error message
-            alert('Error creating tax record');
-        });
-    });
-    
 
     
     // Function to generate due date options dynamically based on the current year
@@ -323,91 +300,14 @@ document.getElementById('taxRateField').addEventListener('input', updateSummaryT
 // Call updateSummaryTable() initially to ensure it updates the summary table with default tax rate
 updateSummaryTable();
 
-$(document).ready(function() {
-    // Submit form using AJAX
-    $('#taxForm').submit(function(event) {
-        event.preventDefault(); // Prevent default form submission
 
-        // Serialize form data
-        var formData = $(this).serialize();
-
-        // Submit form data asynchronously
-        $.ajax({
-            type: 'POST',
-            url: $(this).attr('action'),
-            data: formData,
-            dataType: 'json', // Expect JSON response
-            success: function(response) {
-                // If submission is successful, display success message
-                alert('Record submitted');
-                // Clear form fields
-                $('#taxForm')[0].reset();
-            },
-            error: function(xhr, status, error) {
-                console.error(xhr.responseText); // Log error message
-                // Display error message to the user
-                alert('Error: ' + xhr.responseJSON.message);
-            }
-        });
-    });
-});
-
-document.getElementById('taxForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent default form submission
-    const formData = new FormData(this);
-    
-    // Submit form data asynchronously
-    fetch('/taxes', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json()) // Parse response as JSON
-    .then(data => {
-        // Display success message
-        alert('Record submitted');
-        // Clear form fields
-        document.getElementById('taxForm').reset();
-    })
-    .catch(error => {
-        console.error('Error creating tax record:', error);
-        // Display error message
-        alert('Error creating tax record');
-    });
-});
-
-
-
- fetch('/taxes', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        const tableBody = document.querySelector('#tax-records-table tbody');
-        data.forEach(record => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${record.id}</td>
-                <td>${record.company}</td>
-                <td>${record.amount}</td>
-                <td>${record.payment_date}</td>
-                <td>${record.status}</td>
-                <td>${record.due_date}</td>
-                <td>${record.tax_due}</td>
-            `;
-            tableBody.appendChild(row);
-        });
-    })
-    .catch(error => console.error('Error fetching tax records:', error));
 
     // Call the function to generate due date options when the page loads
     window.onload = function() {
         generateDueDateOptions();
         fetchTaxRecords();
-        const selectedDueDate = document.getElementById('summaryDueDate').value; // Get the currently selected due date
-        generateSummaryDueDateOptions(selectedDueDate);
+        // const selectedDueDate = document.getElementById('summaryDueDate').value; // Get the currently selected due date
+        // generateSummaryDueDateOptions(selectedDueDate);
         console.log('Due date options generated.');
     };
+
