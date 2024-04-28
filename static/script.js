@@ -292,7 +292,7 @@ function populateSummaryTable(records) {
     const taxRate = parseFloat(document.getElementById('taxRateField').value);
     const taxDue = totalAmount * taxRate;
     document.getElementById('taxDue').textContent = taxDue.toFixed(2);
-    document.getElementById('taxRate').textContent = taxRate.toFixed(2);
+    document.getElementById('taxRate').textContent = taxRate.toFixed(2)*100 + '%';
 }   
 
 // Add event listener to taxRateField to trigger updateSummaryTable() on input change
@@ -312,3 +312,53 @@ updateSummaryTable();
         console.log('Due date options generated.');
     };
 
+    function submitForm() {
+        // Get form data
+        var formData = new FormData(document.getElementById('taxForm'));
+
+        // Send form data asynchronously using AJAX
+        fetch('/taxes', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                // If the response is successful, display a success message
+                alert('Record added successfully.');
+                // Optionally, you can reset the form here:
+                // document.getElementById('taxForm').reset();
+            } else {
+                // If there's an error, display an error message
+                alert('Error adding record.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error adding record.');
+        });
+    }
+
+    document.getElementById("taxForm").addEventListener("submit", function(event) {
+        // Prevent the default form submission behavior
+        event.preventDefault();
+        
+        // Perform any necessary form validation here
+        
+        // Submit the form data asynchronously using fetch or XMLHttpRequest
+        fetch('/taxes', {
+            method: 'POST',
+            body: new FormData(document.getElementById('taxForm'))
+        })
+        .then(response => {
+            if (response.ok) {
+                // If the request was successful, redirect to the home page
+                window.location.href = '/all';
+            } else {
+                // Handle errors if needed
+                console.error('Failed to save tax data');
+            }
+        })
+        .catch(error => {
+            console.error('Error occurred while saving tax data:', error);
+        });
+    });

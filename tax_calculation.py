@@ -21,4 +21,5 @@ def handle_tax_form():
     # Insert the record into the database
     insert_tax_record(company, amount, payment_date, status, due_date, tax_due)
     
-    return 'Record added successfully.'
+    # return redirect(url_for('tax_record_ui.allrecords'))
+    return redirect(url_for('tax_record_ui.allrecord'))

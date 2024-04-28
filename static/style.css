@@ -101,3 +101,36 @@ tr:hover {
     padding: 10px 20px; /* Add some padding */
     margin-left: 10px; /* Move the button a little to the right */
 }
+
+#scrollButton {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Style for form container */
+#formContainer {
+    margin-top: 50px; /* Add margin to push down content below form */
+}
+
+
+
+#taxTableContainer {
+    height: 300px; /* Set the desired height for the table container */
+    overflow-y: auto; /* Enable vertical scrolling */
+    position: relative; /* Set the container position to relative */
+}
+
+#taxTable thead {
+    position: sticky; /* Make the table header sticky */
+    top: 0; /* Position it at the top of the container */
+    background-color: white; /* Optional: set a background color */
+    z-index: 1; /* Ensure the header stays above other elements */
+}

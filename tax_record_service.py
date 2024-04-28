@@ -1,6 +1,6 @@
 
 import sqlite3
-from flask import Flask, render_template, request, jsonify,Blueprint
+from flask import Flask, render_template, request, jsonify,Blueprint,redirect, url_for
 from models import *
 
 
@@ -58,6 +58,7 @@ def handle_tax_form():
     # # Insert the record into the database
     insert_tax_record(company, amount, payment_date, status, due_date, tax_due)
 
+  
     return 'Record added successfully.'
 
 
