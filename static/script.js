@@ -292,7 +292,8 @@ function populateSummaryTable(records) {
     const taxRate = parseFloat(document.getElementById('taxRateField').value);
     const taxDue = totalAmount * taxRate;
     document.getElementById('taxDue').textContent = taxDue.toFixed(2);
-}
+    document.getElementById('taxRate').textContent = taxRate.toFixed(2);
+}   
 
 // Add event listener to taxRateField to trigger updateSummaryTable() on input change
 document.getElementById('taxRateField').addEventListener('input', updateSummaryTable);
@@ -306,8 +307,8 @@ updateSummaryTable();
     window.onload = function() {
         generateDueDateOptions();
         fetchTaxRecords();
-        // const selectedDueDate = document.getElementById('summaryDueDate').value; // Get the currently selected due date
-        // generateSummaryDueDateOptions(selectedDueDate);
+        const selectedDueDate = document.getElementById('summaryDueDate').value; // Get the currently selected due date
+        generateSummaryDueDateOptions(selectedDueDate);
         console.log('Due date options generated.');
     };
 

@@ -4,7 +4,7 @@
 
 <body>
     
-    <h1>Tax Payment Tracking System</h1>
+    <h1 id="indexTitle">Tax Payment Tracking System</h1>
 
 
     <div id="taxTableContainer">
@@ -26,9 +26,9 @@
     </div>
 
     <h2>Summary</h2>
-    <label for="taxRate">Enter Tax Rate (decimal):</label>
+    <label id="taxfield" for="taxRate">Enter Tax Rate (decimal):</label>
     <input type="text" id="taxRateField" name="taxRate" required><br><br>
-    <label for="summaryDueDate">Select Due Date:</label>
+    <label id="duedatefield" for="summaryDueDate">Select Due Date:</label>
     <select id="summaryDueDate" name="summaryDueDate" onchange="updateSummaryTable()">
     </select><br><br>
 
@@ -42,8 +42,9 @@
                 <tr>
                     <th>Company</th>
                     <th>Amount</th>
+                    <th>Payment Date</th>
                     <th>Status</th>
-                    <th>Due Date</th>
+                   <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -91,7 +92,7 @@
 <select id="editDueDateSelect" name="dueDate" required>
    
             </select><br><br>
-            <input type="submit" value="Save">
+            <input id="saveButton" type="submit" value="Save">
         </form>
     </div>
 </div>
